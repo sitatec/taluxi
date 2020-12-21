@@ -1,4 +1,4 @@
-package com.taluxi.taluxi
+package com.taluxi
 
 import io.flutter.embedding.android.FlutterActivity
 
