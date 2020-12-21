@@ -10,3 +10,4 @@ target 'Runner' do
 end
 
 pod 'Firebase/Analytics'
+pod 'Firebase/Auth'
