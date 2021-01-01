@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:taluxi/pages/home_page/home_page.dart';
+
+import '../../../home_page/home_page.dart';
 import 'commons_form_widgets.dart';
 
 class LoginForm extends StatefulWidget {
@@ -31,7 +32,13 @@ class _LoginFormState extends State<LoginForm> {
           Form(
             key: _formKey,
             child: Column(
-              children: const [emailField, PasswordField()],
+              children: const [
+                emailField,
+                SizedBox(
+                  height: 16,
+                ),
+                PasswordField()
+              ],
             ),
           ),
           SizedBox(

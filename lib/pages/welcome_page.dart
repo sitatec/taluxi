@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../core/constants/colors.dart';
 import '../core/widgets/core_widgts.dart';
 import 'auth_page/auth_page.dart';

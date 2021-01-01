@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'auth_page_widgets/forms/login_form.dart';
+
 import 'auth_page_widgets/bezier_container.dart';
+import 'auth_page_widgets/forms/login_form.dart';
 import 'auth_page_widgets/forms/signup_form.dart';
 
 class AuthenticationPage extends StatefulWidget {

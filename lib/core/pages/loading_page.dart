@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:taluxi/core/widgets/core_widgts.dart';
+
+import '../widgets/core_widgts.dart';
 
 class LoadingPage extends StatelessWidget {
   const LoadingPage({Key key}) : super(key: key);
@@ -21,7 +22,6 @@ class LoadingPage extends StatelessWidget {
               fontSize: 40,
             ),
             Card(
-              elevation: 20,
               child: Container(
                 height: deviceSize.height * 0.28,
                 child: Column(

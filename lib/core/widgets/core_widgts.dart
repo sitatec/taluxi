@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../constants/colors.dart';
 
 class OAuthButton extends StatelessWidget {
@@ -105,13 +106,12 @@ class Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       textAlign: TextAlign.center,
-      text: TextSpan(
-          text: 'Ta',
-          style: GoogleFonts.lobsterTwo(
-            textStyle: Theme.of(context).textTheme.headline4,
-            fontSize: fontSize,
-            color: _taxiColor,
-          ),
+      text: TextSpan(text: 'Ta',
+          // style: GoogleFonts.lobsterTwo(
+          //   textStyle: Theme.of(context).textTheme.headline4,
+          //   fontSize: fontSize,
+          //   color: _taxiColor,
+          // ),
           children: [
             TextSpan(
                 text: 'lu',

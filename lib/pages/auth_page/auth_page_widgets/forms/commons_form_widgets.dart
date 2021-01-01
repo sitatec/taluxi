@@ -93,16 +93,17 @@ class FormValidatorButton extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(30)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.grey.shade200,
-                offset: Offset(2, 4),
-                blurRadius: 5,
-                spreadRadius: 2,
-              )
-            ],
-            gradient: mainLinearGradient),
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.grey.shade200,
+              offset: Offset(2, 4),
+              blurRadius: 5,
+              spreadRadius: 2,
+            )
+          ],
+          gradient: mainLinearGradient,
+        ),
         child: Text(
           title,
           style: TextStyle(fontSize: 20, color: Colors.white),

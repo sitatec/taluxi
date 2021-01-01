@@ -32,7 +32,7 @@ class CustomDrower extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              //Todo: Logout user
+              //TODO: Logout user
             },
             title: Text("Se déconnecter"),
             trailing: Icon(

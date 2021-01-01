@@ -2,11 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:taluxi/core/constants/colors.dart';
-import 'package:taluxi/core/widgets/core_widgts.dart';
-import 'package:taluxi/core/widgets/custom_drawer.dart';
-import 'package:taluxi/pages/home_page/home_page_widgets.dart';
-import 'package:taluxi/pages/taxi_tracker_page/taxi_tracker_page.dart';
+
+import '../../core/constants/colors.dart';
+import '../../core/widgets/core_widgts.dart';
+import '../../core/widgets/custom_drawer.dart';
+import '../taxi_tracker_page/taxi_tracker_page.dart';
+import 'home_page_widgets.dart';
 
 final customWhiteColor = Color(0xF5FCFAFA);
 
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
   HomePage({Key key}) : super(key: key);
 
   final bottomConatainerBorderRadius = Radius.circular(40);
-
+//TODO Refactoring : extract widgets for better names.
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -155,7 +156,7 @@ class BottomRoundedContainer extends StatelessWidget {
         ),
       ),
       child: Container(
-        margin: EdgeInsets.only(top: 30),
+        margin: EdgeInsets.only(top: 40),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),

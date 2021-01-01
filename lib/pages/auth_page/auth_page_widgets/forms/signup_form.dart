@@ -54,6 +54,41 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
+  Widget _form() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          CustomTextField(
+            prefixIcon: Icon(Icons.person),
+            maxLength: 30,
+            title: "Nom",
+            validator: namesValidator,
+          ),
+          CustomTextField(
+            prefixIcon: Icon(Icons.person_outline),
+            maxLength: 30,
+            title: "Prénom",
+            validator: namesValidator,
+          ),
+          CustomTextField(
+            maxLength: 9,
+            prefixIcon: Icon(Icons.phone),
+            helperText: "Le numéro de téléphone est facultatif",
+            title: "Téléphone",
+            fieldType: TextInputType.numberWithOptions(),
+            validator: phoneNumberValidator,
+          ),
+          emailField,
+          SizedBox(
+            height: 16,
+          ),
+          PasswordField(),
+        ],
+      ),
+    );
+  }
+
   Future<void> _showFacebookSignInSuggestion() {
     return showDialog(
       context: context,
@@ -67,15 +102,15 @@ class _SignUpFormState extends State<SignUpForm> {
             Center(
               child: RaisedButton(
                 onPressed: () {
-                  //Todo Facebook login
+                  //TODO Facebook login
                 },
                 child: Text("Me connecter à l'aide de Facebook"),
               ),
             ),
             Center(
               child: RaisedButton(
-                onPressed: () => Navigator.pop(context),
                 child: Text("Remplire le formulaire"),
+                onPressed: () => Navigator.pop(context),
               ),
             )
           ],
@@ -110,38 +145,6 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _form() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          CustomTextField(
-            prefixIcon: Icon(Icons.person),
-            maxLength: 30,
-            title: "Nom",
-            validator: namesValidator,
-          ),
-          CustomTextField(
-            prefixIcon: Icon(Icons.person_outline),
-            maxLength: 30,
-            title: "Prénom",
-            validator: namesValidator,
-          ),
-          CustomTextField(
-            maxLength: 9,
-            prefixIcon: Icon(Icons.phone),
-            helperText: "Le numéro de téléphone est facultatif",
-            title: "Téléphone",
-            fieldType: TextInputType.numberWithOptions(),
-            validator: phoneNumberValidator,
-          ),
-          emailField,
-          PasswordField(),
-        ],
       ),
     );
   }
