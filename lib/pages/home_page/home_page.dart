@@ -7,7 +7,6 @@ import 'package:user_manager/user_manager.dart';
 import '../../core/constants/colors.dart';
 import '../../core/widgets/core_widgts.dart';
 import '../../core/widgets/custom_drawer.dart';
-import '../taxi_tracker_page/taxi_tracker_page.dart';
 import 'home_page_widgets.dart';
 
 final customWhiteColor = Color(0xF5FCFAFA);
@@ -96,16 +95,17 @@ class HomePage extends StatelessWidget {
           child: Logo(backgroundColorIsOrange: true, fontSize: 43),
           height: floatingActionButtonSize,
           width: floatingActionButtonSize * 2.2,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  ChangeNotifierProvider<AuthenticationProvider>.value(
-                value: _authProvider,
-                child: TaxiTracker(),
-              ),
-            ),
-          ),
+          onTap: () => showTrophiesWonDialog('ACDH', context),
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) =>
+          //         ChangeNotifierProvider<AuthenticationProvider>.value(
+          //       value: _authProvider,
+          //       child: TaxiTracker(),
+          //     ),
+          //   ),
+          // ),
         ),
         margin: EdgeInsets.only(bottom: deviceSize.height * .09),
       ),
