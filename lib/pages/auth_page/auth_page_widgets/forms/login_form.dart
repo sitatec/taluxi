@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taluxi/core/utils/form_fields_validators.dart';
 import 'package:taluxi/core/widgets/core_widgts.dart';
-import 'package:taluxi/logic/sign_in_logic.dart';
 import 'package:user_manager/user_manager.dart';
 
-import '../../../home_page/home_page.dart';
 import 'commons_form_widgets.dart';
 
 class LoginForm extends StatefulWidget {
