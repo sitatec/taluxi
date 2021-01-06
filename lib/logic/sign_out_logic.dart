@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:user_manager/user_manager.dart';
 
-class SignOutLogic {
+class SignOutBusinessLogic {
   AuthenticationProvider authenticationProvider;
   final _streamController = StreamController<SignOutError>();
 
-  SignOutLogic(this.authenticationProvider);
+  SignOutBusinessLogic(this.authenticationProvider);
 
   Stream<SignOutError> get errorStream => _streamController.stream;
 
@@ -18,7 +18,7 @@ class SignOutLogic {
     }
   }
 
-// TODO : create Logic class to make logics generic.
+// TODO : create BusinessLogic class to make logics generic.
   void _handleError(dynamic error) {
     switch (error.runtimeType) {
       case AuthenticationException:

@@ -5,18 +5,19 @@ import 'package:user_manager/user_manager.dart';
 import '../mocks/authentication_provider_mock.dart';
 
 void main() {
-  SignInLogic signInLogic;
+  SignInBusinessLogic signInBusinessLogic;
   AuthenticationProvider authenticationProvider;
   authenticationProvider = MockAuthenticationProvider();
   setUp(() {
-    signInLogic = SignInLogic(authenticationProvider);
+    signInBusinessLogic = SignInBusinessLogic(authenticationProvider);
   });
   test(
-      '[SignInLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
+      '[SignInBusinessLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
       () async {
-    await signInLogic.signInWithEmailAndPassword(email: '', password: '');
+    await signInBusinessLogic.signInWithEmailAndPassword(
+        email: '', password: '');
     expect(
-      (await signInLogic.errorStream.first).errorMessage,
+      (await signInBusinessLogic.errorStream.first).errorMessage,
       equals(
           MockAuthenticationProvider.exceptionToBeThrownWhenSigningIn.message),
       reason: 'signInWithEmailAndPassword',
@@ -24,11 +25,11 @@ void main() {
   });
 
   test(
-      '[SignInLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
+      '[SignInBusinessLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
       () async {
-    await signInLogic.signInWithFacebook();
+    await signInBusinessLogic.signInWithFacebook();
     expect(
-      (await signInLogic.errorStream.first).errorMessage,
+      (await signInBusinessLogic.errorStream.first).errorMessage,
       equals(
           MockAuthenticationProvider.exceptionToBeThrownWhenSigningIn.message),
       reason: 'signInWithFacebook',
@@ -36,11 +37,11 @@ void main() {
   });
 
   test(
-      '[SignInLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
+      '[SignInBusinessLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
       () async {
-    await signInLogic.resetPassword('');
+    await signInBusinessLogic.resetPassword('');
     expect(
-      (await signInLogic.errorStream.first).errorMessage,
+      (await signInBusinessLogic.errorStream.first).errorMessage,
       equals(MockAuthenticationProvider
           .exceptionToBeThrownWhenResetingPassword.message),
       reason: 'resetPassword',

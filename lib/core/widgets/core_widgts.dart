@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:user_manager/user_manager.dart';
 
 import '../constants/colors.dart';
 
@@ -82,13 +84,55 @@ class OAuthButton extends StatelessWidget {
 }
 
 class FacebookLoginButton extends StatelessWidget {
-  const FacebookLoginButton({Key key}) : super(key: key);
+  final void Function() onClick;
+  const FacebookLoginButton({Key key, this.onClick}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return OAuthButton(
+      onClick: onClick,
       initials: "f",
       text: "Se connecter avec Facebook",
+    );
+  }
+}
+
+Future<void> showWaitDialog(String title, BuildContext context) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+        ),
+        content: WaitWidget(),
+      );
+    },
+  );
+}
+
+class WaitWidget extends StatelessWidget {
+  const WaitWidget({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    return Container(
+      height: screenSize.height * 0.27,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SpinKitCubeGrid(
+            color: Color(0xFFFFAE16),
+          ),
+          Text(
+            "   Veuillez patiantez un instant s'il vous plait.   ",
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -106,21 +150,66 @@ class Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       textAlign: TextAlign.center,
-      text: TextSpan(text: 'Ta',
-          // style: GoogleFonts.lobsterTwo(
-          //   textStyle: Theme.of(context).textTheme.headline4,
-          //   fontSize: fontSize,
-          //   color: _taxiColor,
-          // ),
-          children: [
-            TextSpan(
-                text: 'lu',
-                style: TextStyle(fontSize: fontSize, color: Color(0xFF424141))),
-            TextSpan(
-              text: 'xi',
-              style: TextStyle(color: _taxiColor, fontSize: fontSize),
-            ),
-          ]),
+      text: TextSpan(
+        text: 'Ta',
+        style: TextStyle(
+          fontFamily: 'LobsterTwo',
+          fontSize: fontSize,
+          color: _taxiColor,
+        ),
+        children: [
+          TextSpan(
+              text: 'lu',
+              style: TextStyle(fontSize: fontSize, color: Color(0xFF424141))),
+          TextSpan(
+            text: 'xi',
+            style: TextStyle(color: _taxiColor, fontSize: fontSize),
+          ),
+        ],
+      ),
     );
+  }
+}
+
+class Trophy extends StatelessWidget {
+  final trophies = UserRepository.trophiesList;
+  final String level;
+  final bool active;
+  static const double _trophySize = 74;
+  const Trophy({@required this.level, this.active = false});
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/trophies/$level.svg',
+              width: _trophySize,
+              height: _trophySize,
+            ),
+            Container(
+              width: _trophySize + 22,
+              height: _trophySize + 7,
+              color: Colors.black38,
+              child: Text(
+                'Non obtenue',
+                style: TextStyle(
+                    color: Color(0xFFFDFDFD), fontWeight: FontWeight.w600),
+              ),
+              alignment: Alignment.center,
+            )
+          ],
+        ),
+        Text(
+          trophies[level].name,
+          textScaleFactor: .97,
+          textAlign: TextAlign.center,
+        )
+      ],
+    ));
   }
 }

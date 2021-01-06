@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:taluxi/core/widgets/core_widgts.dart';
+import 'package:user_manager/user_manager.dart';
 
 import '../../../../core/utils/form_fields_validators.dart';
 import 'commons_form_widgets.dart';
@@ -13,16 +16,30 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
+  var email = '';
+  var password = '';
+  var firstName = '';
+  var lastName = '';
+  bool waitDialogIsShown = false;
+  AuthenticationProvider authProvider;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 1), _showFacebookSignInSuggestion);
+    Future.delayed(Duration(milliseconds: 1100), _showFacebookSignInSuggestion);
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    authProvider = Provider.of<AuthenticationProvider>(context, listen: true);
+    if (authProvider.authState == AuthState.registering) {
+      Future.delayed(Duration.zero, () async {
+        waitDialogIsShown = true;
+        showWaitDialog('Inscription en cours', context);
+      });
+    }
+
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -44,13 +61,50 @@ class _SignUpFormState extends State<SignUpForm> {
             height: 15,
           ),
           FormValidatorButton(
-            onClick: () {
-              if (_formKey.currentState.validate()) print("Subscribed!!!!");
+            onClick: () async {
+              if (_formKey.currentState.validate())
+                await authProvider
+                    .registerUser(
+                      email: email,
+                      password: password,
+                      firstName: firstName,
+                      lastName: lastName,
+                    )
+                    .then((_) => Navigator.of(context)
+                        .popUntil((route) => route.isFirst))
+                    .catchError(_onSignUpError);
             },
           ),
           _formLoginLink(),
         ],
       ),
+    );
+  }
+
+  void _onSignUpError(dynamic error) async {
+    if (waitDialogIsShown) {
+      Navigator.of(context).pop();
+      waitDialogIsShown = false;
+    }
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Echec de l\'inscription'),
+          content: Text(error.message),
+          actions: [
+            Center(
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Fermer'),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -60,30 +114,32 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         children: <Widget>[
           CustomTextField(
+            onChange: (value) => lastName = value,
             prefixIcon: Icon(Icons.person),
             maxLength: 30,
             title: "Nom",
             validator: namesValidator,
           ),
           CustomTextField(
+            onChange: (value) => firstName = value,
             prefixIcon: Icon(Icons.person_outline),
             maxLength: 30,
             title: "Prénom",
             validator: namesValidator,
           ),
           CustomTextField(
-            maxLength: 9,
-            prefixIcon: Icon(Icons.phone),
-            helperText: "Le numéro de téléphone est facultatif",
-            title: "Téléphone",
-            fieldType: TextInputType.numberWithOptions(),
-            validator: phoneNumberValidator,
+            onChange: (value) => email = value,
+            title: "Email",
+            prefixIcon: Icon(Icons.email_rounded),
+            fieldType: TextInputType.emailAddress,
+            validator: emailFieldValidator,
           ),
-          emailField,
           SizedBox(
             height: 16,
           ),
-          PasswordField(),
+          PasswordField(
+            onChanged: (value) => password = value,
+          ),
         ],
       ),
     );
@@ -101,15 +157,17 @@ class _SignUpFormState extends State<SignUpForm> {
           actions: [
             Center(
               child: RaisedButton(
-                onPressed: () {
-                  //TODO Facebook login
+                onPressed: () async {
+                  await authProvider
+                      .signInWithFacebook()
+                      .catchError(_onSignUpError);
                 },
                 child: Text("Me connecter à l'aide de Facebook"),
               ),
             ),
             Center(
               child: RaisedButton(
-                child: Text("Remplire le formulaire"),
+                child: Text("Créer un nouveau compte"),
                 onPressed: () => Navigator.pop(context),
               ),
             )

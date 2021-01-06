@@ -5,18 +5,18 @@ import 'package:user_manager/user_manager.dart';
 import '../mocks/authentication_provider_mock.dart';
 
 void main() {
-  SignOutLogic signOutLogic;
+  SignOutBusinessLogic signOutBusinessLogic;
   AuthenticationProvider authenticationProvider;
   authenticationProvider = MockAuthenticationProvider();
   setUp(() {
-    signOutLogic = SignOutLogic(authenticationProvider);
+    signOutBusinessLogic = SignOutBusinessLogic(authenticationProvider);
   });
   test(
-      '[signOutLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
+      '[signOutBusinessLogic] should handle occured errors and add [SignUpError] with the corresponding error message to the [errorStream]',
       () async {
-    await signOutLogic.signOut();
+    await signOutBusinessLogic.signOut();
     expect(
-      (await signOutLogic.errorStream.first).errorMessage,
+      (await signOutBusinessLogic.errorStream.first).errorMessage,
       equals(
           MockAuthenticationProvider.exceptionToBeThrownWhenSigningOut.message),
       reason: 'signOut',

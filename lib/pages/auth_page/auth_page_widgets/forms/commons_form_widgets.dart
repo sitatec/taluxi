@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final String title;
   final bool isPassword;
   final String Function(String) validator;
+  final void Function(String) onChange;
   final TextInputType fieldType;
   final int maxLength;
   final String helperText;
@@ -19,6 +20,7 @@ class CustomTextField extends StatelessWidget {
       this.maxLength,
       this.helperText,
       this.prefixIcon,
+      this.onChange,
       this.suffixIcon,
       this.isPassword = false});
 
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
+              onChanged: onChange,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               maxLength: maxLength,
               keyboardType: fieldType,
@@ -52,7 +55,8 @@ class CustomTextField extends StatelessWidget {
 }
 
 class PasswordField extends StatefulWidget {
-  const PasswordField({Key key}) : super(key: key);
+  final void Function(String) onChanged;
+  const PasswordField({Key key, this.onChanged}) : super(key: key);
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
@@ -64,6 +68,7 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
     return CustomTextField(
+      onChange: widget.onChanged,
       suffixIcon: IconButton(
         icon: Icon(
           isHiddenPassword ? Icons.visibility : Icons.visibility_off,
@@ -120,10 +125,3 @@ class FormValidatorButton extends StatelessWidget {
 //   isPassword: true,
 //   validator: passWordValidator,
 // );
-
-const emailField = CustomTextField(
-  title: "Email",
-  prefixIcon: Icon(Icons.email_rounded),
-  fieldType: TextInputType.emailAddress,
-  validator: emailFieldValidator,
-);

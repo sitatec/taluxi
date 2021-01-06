@@ -12,7 +12,7 @@ class CustomElevatedButton extends StatefulWidget {
   final VoidCallback onTap;
   const CustomElevatedButton(
       {Key key,
-      this.elevation,
+      this.elevation = 6,
       this.child,
       this.width,
       this.height,
@@ -26,6 +26,7 @@ class CustomElevatedButton extends StatefulWidget {
 class _CustomElevatedButtonState extends State<CustomElevatedButton> {
   double buttonElevation;
   bool buttonIsDown = false;
+  final double buttonRaduis = 12;
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
                     gradient: LinearGradient(
                         colors: const [Color(0xFFE0A500), Color(0xFFDF7E00)]),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(17)),
+                    borderRadius: BorderRadius.circular(buttonRaduis)),
               ),
               bottom: 0,
             ),
@@ -61,7 +62,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
                 decoration: BoxDecoration(
                   gradient: mainLinearGradient,
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(17),
+                  borderRadius: BorderRadius.circular(buttonRaduis),
                 ),
               ),
               bottom: buttonElevation,
@@ -86,175 +87,3 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
     );
   }
 }
-
-// class WaveButton extends StatelessWidget {
-//   final VoidCallback onTap;
-//   final double size;
-//   final Widget child;
-//   final int waveCount;
-//   final double distanceBetweenWaves;
-//   final double waveBlurRaduis;
-//   const WaveButton({
-//     Key key,
-//     this.size,
-//     this.onTap,
-//     this.waveBlurRaduis = 18,
-//     this.child,
-//     this.waveCount = 2,
-//     this.distanceBetweenWaves = 40,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       child: Stack(
-//         alignment: Alignment.center,
-//         children: waves(),
-//       ),
-//       onTap: onTap,
-//     );
-//   }
-
-//   List<CircularWave> waves() {
-//     var waveList = <CircularWave>[];
-//     // We need to manualy add the last wave because he should contain a widget
-//     // (the WaveButton child) so we need to substract wan 1 to the waveCount
-//     var currentWaveIndex = waveCount - 1;
-//     while (currentWaveIndex > 0) {
-//       waveList.add(
-//         CircularWave(
-//           size: size + (distanceBetweenWaves * currentWaveIndex),
-//           blurRadius: waveBlurRaduis - (currentWaveIndex * 2),
-//         ),
-//       );
-//       currentWaveIndex--;
-//     }
-//     waveList.add(CircularWave(
-//       size: size,
-//       child: child,
-//       blurRadius: waveBlurRaduis,
-//     ));
-//     return waveList;
-//   }
-// }
-
-// class AnimatedWaveButton extends StatefulWidget {
-//   final VoidCallback onTap;
-//   final double size;
-//   final Widget child;
-//   final int waveCount;
-//   final double distanceBetweenWaves;
-//   final double minBlurRaduis;
-//   final double maxBlurRaduis;
-//   const AnimatedWaveButton({
-//     Key key,
-//     this.size,
-//     this.onTap,
-//     this.minBlurRaduis = 5,
-//     this.maxBlurRaduis = 15,
-//     this.child,
-//     this.waveCount = 2,
-//     this.distanceBetweenWaves = 40,
-//   }) : super(key: key);
-
-//   @override
-//   _AnimatedWaveButtonState createState() => _AnimatedWaveButtonState();
-// }
-
-// class _AnimatedWaveButtonState extends State<AnimatedWaveButton>
-//     with SingleTickerProviderStateMixin {
-//   AnimationController controller;
-//   Animation<double> waveBlurRaduisAnimation;
-//   bool isReversedAnimation = false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     controller =
-//         AnimationController(vsync: this, duration: Duration(seconds: 3))
-//           ..forward();
-//     waveBlurRaduisAnimation =
-//         Tween<double>(begin: widget.minBlurRaduis, end: widget.maxBlurRaduis)
-//             .animate(controller);
-//     controller.addListener(() {
-//       setState(() {});
-//       if (controller.status == AnimationStatus.completed) controller.reverse();
-//       if (controller.status == AnimationStatus.dismissed)
-//         Future.delayed(Duration(seconds: 6), () => controller.forward());
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return WaveButton(
-//       child: widget.child,
-//       onTap: widget.onTap,
-//       size: widget.size,
-//       waveCount: widget.waveCount,
-//       distanceBetweenWaves: widget.distanceBetweenWaves,
-//       waveBlurRaduis: waveBlurRaduisAnimation.value,
-//     );
-//   }
-// }
-
-// class CircularWave extends StatelessWidget {
-//   final double blurRadius;
-//   const CircularWave({
-//     Key key,
-//     this.child,
-//     this.blurRadius,
-//     @required this.size,
-//   }) : super(key: key);
-
-//   final Widget child;
-//   final double size;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: Center(child: child),
-//       height: size,
-//       width: size,
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         shape: BoxShape.circle,
-//         boxShadow: [
-//           CustomBoxShadow(
-//             color: Colors.black54,
-//             blurRadius: blurRadius,
-//             blurStyle: BlurStyle.outer,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class CustomBoxShadow extends BoxShadow {
-//   final BlurStyle blurStyle;
-
-//   const CustomBoxShadow({
-//     Color color = const Color(0xFF000000),
-//     Offset offset = Offset.zero,
-//     double blurRadius = 0.0,
-//     this.blurStyle = BlurStyle.normal,
-//   }) : super(color: color, offset: offset, blurRadius: blurRadius);
-
-//   @override
-//   Paint toPaint() {
-//     final Paint result = Paint()
-//       ..color = color
-//       ..maskFilter = MaskFilter.blur(this.blurStyle, blurSigma);
-//     assert(() {
-//       if (debugDisableShadows) result.maskFilter = null;
-//       return true;
-//     }());
-//     return result;
-//   }
-// }

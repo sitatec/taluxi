@@ -15,4 +15,7 @@
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@android:color/white</item>
     </style>
+    <string name="app_name">Taluxi</string>
+    <string name="facebook_app_id">690963638286209</string> 
+    <string name="fb_login_protocol_scheme">fb690963638286209</string>
 </resources>

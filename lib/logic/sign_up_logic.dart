@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:user_manager/user_manager.dart';
 
-class SignUpLogic {
+class SignUpBusinessLogic {
   AuthenticationProvider authenticationProvider;
   final _streamController = StreamController<SignUpError>();
 
-  SignUpLogic(this.authenticationProvider);
+  SignUpBusinessLogic(this.authenticationProvider);
 
   Stream<SignUpError> get errorStream => _streamController.stream;
 

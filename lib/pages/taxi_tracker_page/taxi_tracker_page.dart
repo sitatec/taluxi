@@ -25,6 +25,20 @@ class TaxiTracker extends StatefulWidget {
 
 class _TaxiTrackerState extends State<TaxiTracker> {
   Completer<GoogleMapController> _mapController = Completer();
+  var _mapOpacity = 0.0;
+  Timer timer;
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer(
+        Duration(milliseconds: 500), () => setState(() => _mapOpacity = 1));
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +47,16 @@ class _TaxiTrackerState extends State<TaxiTracker> {
       body: Builder(
         builder: (context) => Container(
           child: Stack(children: [
-            GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: TaxiTracker._kGooglePlex,
-              onMapCreated: (GoogleMapController controller) async {
-                _mapController.complete(controller);
-              },
+            AnimatedOpacity(
+              duration: Duration(milliseconds: 500),
+              opacity: _mapOpacity,
+              child: GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: TaxiTracker._kGooglePlex,
+                onMapCreated: (GoogleMapController controller) async {
+                  _mapController.complete(controller);
+                },
+              ),
             ),
             _backButton(context),
             _menuButton(context),

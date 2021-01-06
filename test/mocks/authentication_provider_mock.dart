@@ -13,7 +13,7 @@ class MockAuthenticationProvider extends Mock
   static const exceptionToBeThrownWhenResetingPassword =
       AuthenticationException.unknown();
 
-// TODO test password reset exception handling in [SignInLogic] .
+// TODO test password reset exception handling in [SignInBusinessLogic] .
 
   @override
   Future<void> registerUser({

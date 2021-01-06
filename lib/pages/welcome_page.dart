@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:user_manager/user_manager.dart';
 
 import '../core/constants/colors.dart';
 import '../core/widgets/core_widgts.dart';
@@ -14,8 +16,19 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  AuthenticationProvider authProvider;
+  bool waitDialogIsShown = false;
+
   @override
   Widget build(BuildContext context) {
+    authProvider = Provider.of<AuthenticationProvider>(context, listen: true);
+    if (authProvider.authState == AuthState.authenticating) {
+      Future.delayed(Duration.zero, () async {
+        waitDialogIsShown = true;
+        showWaitDialog('Inscription en cours', context);
+      });
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -53,11 +66,44 @@ class _WelcomePageState extends State<WelcomePage> {
                 height: 20,
               ),
               CustomDivider(),
-              FacebookLoginButton(),
+              FacebookLoginButton(
+                onClick: () async => await authProvider
+                    .signInWithFacebook()
+                    .then((_) => Navigator.of(context)
+                        .popUntil((route) => route.isFirst))
+                    .catchError(_onSignInError),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _onSignInError(error) async {
+    if (waitDialogIsShown) {
+      Navigator.of(context).pop();
+      waitDialogIsShown = false;
+    }
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Echec de la connexion'),
+          content: Text(error.message),
+          actions: [
+            Center(
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Fermer'),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -67,7 +113,11 @@ class _WelcomePageState extends State<WelcomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AuthenticationPage(authType: AuthType.login),
+            builder: (context) =>
+                ChangeNotifierProvider<AuthenticationProvider>.value(
+              value: authProvider,
+              child: AuthenticationPage(authType: AuthType.login),
+            ),
           ),
         );
       },
@@ -104,8 +154,10 @@ class _WelcomePageState extends State<WelcomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AuthenticationPage(
-              authType: AuthType.signUp,
+            builder: (context) =>
+                ChangeNotifierProvider<AuthenticationProvider>.value(
+              value: authProvider,
+              child: AuthenticationPage(authType: AuthType.signUp),
             ),
           ),
         );
