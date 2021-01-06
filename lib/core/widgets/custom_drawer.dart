@@ -42,29 +42,16 @@ class _CustomDrowerState extends State<CustomDrower> {
                     height: 50,
                     color: Colors.black26,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _userAdditionalDataWidget(
                           'Total des trajets',
                           '${_user.rideCount}',
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(
-                              vertical: BorderSide(
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ),
-                          child: _userAdditionalDataWidget(
-                            'Note moyenne',
-                            '${_user.rideCount}',
-                          ),
-                        ),
+                        VerticalDivider(color: Colors.white),
                         _userAdditionalDataWidget(
-                          'Trophés gagnés',
-                          '${_user.trophiesCount}',
+                          'Note moyenne',
+                          '${_user.rideCount}',
                         ),
                       ],
                     ),
@@ -77,7 +64,7 @@ class _CustomDrowerState extends State<CustomDrower> {
                   style: TextStyle(color: Colors.black54, fontSize: 16.5),
                 ),
                 trailing: Icon(Icons.history),
-                onTap: () => _showGridViewInADialog(
+                onTap: () => _showScrollableInADialog(
                   ListView(
                     children: _buildHistoryListTiles(),
                   ),
@@ -86,20 +73,21 @@ class _CustomDrowerState extends State<CustomDrower> {
               ),
               ListTile(
                 title: Text(
-                  'Voir vos trophés',
+                  'Voir vos médailles',
                   style: TextStyle(color: Colors.black54, fontSize: 16.5),
                 ),
                 trailing: SvgPicture.asset(
-                  'assets/images/cup.svg',
-                  width: 23,
-                  height: 23,
+                  'assets/images/medal.svg',
+                  width: 24,
+                  height: 24,
+                  color: Color(0xFF4D4C4C),
                 ),
-                onTap: () => _showGridViewInADialog(
+                onTap: () => _showScrollableInADialog(
                   GridView.count(
                     crossAxisCount: 2,
                     children: _buildTrophiesList(),
                   ),
-                  'Vos trophés',
+                  'Médailles',
                 ),
               )
             ],
@@ -129,7 +117,7 @@ class _CustomDrowerState extends State<CustomDrower> {
   }
 
   Widget _userAdditionalDataWidget(String title, String count) {
-    final textStyle = TextStyle(color: Colors.white, fontSize: 13.4);
+    final textStyle = TextStyle(color: Colors.white);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -179,7 +167,7 @@ class _CustomDrowerState extends State<CustomDrower> {
     return menuItems;
   }
 
-  void _showGridViewInADialog(Widget child, String title) async {
+  void _showScrollableInADialog(Widget child, String title) async {
     final screenSize = MediaQuery.of(context).size;
     return await showDialog(
       barrierDismissible: false,

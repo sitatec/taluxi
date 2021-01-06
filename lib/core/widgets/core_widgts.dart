@@ -98,19 +98,76 @@ class FacebookLoginButton extends StatelessWidget {
 }
 
 Future<void> showWaitDialog(String title, BuildContext context) async {
-  await showDialog(
+  return await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) {
       return AlertDialog(
-        title: Text(
-          title,
-          textAlign: TextAlign.center,
-        ),
+        title: Text(title, textAlign: TextAlign.center),
         content: WaitWidget(),
       );
     },
   );
+}
+
+Future<void> showTrophiesWonDialog(
+    String trophies, BuildContext context) async {
+  final screenSize = MediaQuery.of(context).size;
+  var trophiesWidgets = <Trophy>[];
+  trophies.split('').forEach((trophyLevel) {
+    trophiesWidgets.add(Trophy(
+      level: trophyLevel,
+      active: true,
+      size: screenSize.width * .38,
+      namePrefix: 'Vous avez éffectué ',
+      spaceBetweenImageAndText: 15,
+    ));
+  });
+  final isSingleTrophy = trophiesWidgets.length == 1;
+  final trophiesCountText = isSingleTrophy ? 'une' : trophiesWidgets.length;
+  return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Félicitaion, vous avez gagnez $trophiesCountText médaille' +
+                (isSingleTrophy ? '' : 's'),
+            textAlign: TextAlign.center,
+            textScaleFactor: .94,
+          ),
+          content: Container(
+            height: screenSize.height * .34,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (!isSingleTrophy)
+                  Text(
+                    'Faites glissez vers la droite pour voir la suivante',
+                    textScaleFactor: .83,
+                  ),
+                SizedBox(
+                  height: screenSize.height * .009,
+                ),
+                Container(
+                  width: screenSize.width * .9,
+                  height: screenSize.height * .3,
+                  child: PageView(
+                    children: trophiesWidgets,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          contentPadding: EdgeInsets.only(bottom: 0, top: 10),
+          actions: [
+            RaisedButton(
+              child: Text('Fermer'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      });
 }
 
 class WaitWidget extends StatelessWidget {
@@ -175,8 +232,15 @@ class Trophy extends StatelessWidget {
   final trophies = UserRepository.trophiesList;
   final String level;
   final bool active;
-  static const double _trophySize = 74;
-  const Trophy({@required this.level, this.active = false});
+  final double size;
+  final String namePrefix;
+  final double spaceBetweenImageAndText;
+  const Trophy(
+      {@required this.level,
+      this.active = false,
+      this.size = 74,
+      this.namePrefix = '',
+      this.spaceBetweenImageAndText = 0});
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -188,24 +252,28 @@ class Trophy extends StatelessWidget {
           children: [
             SvgPicture.asset(
               'assets/images/trophies/$level.svg',
-              width: _trophySize,
-              height: _trophySize,
+              width: size,
+              height: size,
             ),
-            Container(
-              width: _trophySize + 22,
-              height: _trophySize + 7,
-              color: Colors.black38,
-              child: Text(
-                'Non obtenue',
-                style: TextStyle(
-                    color: Color(0xFFFDFDFD), fontWeight: FontWeight.w600),
-              ),
-              alignment: Alignment.center,
-            )
+            if (!active)
+              Container(
+                width: size + 22,
+                height: size + 7,
+                color: Colors.black38,
+                child: Text(
+                  'Bloquée',
+                  style: TextStyle(
+                      color: Color(0xFFFDFDFD), fontWeight: FontWeight.w600),
+                ),
+                alignment: Alignment.center,
+              )
           ],
         ),
+        SizedBox(
+          height: spaceBetweenImageAndText,
+        ),
         Text(
-          trophies[level].name,
+          namePrefix + trophies[level].name,
           textScaleFactor: .97,
           textAlign: TextAlign.center,
         )
