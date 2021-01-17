@@ -18,11 +18,12 @@ dependencies:
     #   ref: main
   cupertino_icons: ^1.0.0
   firebase_core: ^0.5.3
-  firebase_messaging: ^7.0.3
   flutter_svg: 0.19.1
   google_maps_flutter: ^1.0.6
   provider: ^4.3.2+3
   flutter_spinkit: ^4.1.2+1
+  location: ^3.2.1
+  geocoding: ^1.0.5
 
 dev_dependencies:
   flutter_test:
