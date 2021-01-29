@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:taluxi/pages/slash_page.dart';
+import 'package:real_time_location/real_time_location.dart';
+import 'package:taluxi/pages/taxi_tracking_page/taxi_tracking_page.dart';
+import 'package:taluxi_common/taluxi_common.dart';
 import 'package:user_manager/user_manager.dart';
 
-import 'pages/connection_wrong_page.dart';
 import 'pages/home_page/home_page.dart';
 import 'pages/welcome_page.dart';
 
 class App extends StatelessWidget {
-  final _navigatorKey = GlobalKey<NavigatorState>();
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -19,7 +19,6 @@ class App extends StatelessWidget {
       ),
     );
     return MaterialApp(
-        navigatorKey: _navigatorKey,
         title: 'Taluxi',
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
@@ -27,30 +26,38 @@ class App extends StatelessWidget {
           primaryColor: Color(0xFFFFA41C),
         ),
         debugShowCheckedModeBanner: false,
-        home: FutureBuilder(
-          future: initializeBackEndServices(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ConnectionWrongPage()),
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              return ChangeNotifierProvider<AuthenticationProvider>.value(
-                value: AuthenticationProvider.instance,
-                child: AppEntryPoint(_navigatorKey),
-              );
-            }
-            return SlashPage();
-          },
-        ));
+        home: Provider.value(
+          value: RealTimeLocation.instance,
+          updateShouldNotify: (_, __) => false,
+          child: TaxiTrackingPage({
+            'sitatech': Coordinates(
+                latitude: 11.309180549485705, longitude: -12.31927790730373)
+          }),
+        )
+        //  FutureBuilder(
+        //   future: initializeBackEndServices(),
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasError) {
+        //       Navigator.of(context).push(
+        //         MaterialPageRoute(builder: (context) => ConnectionWrongPage()),
+        //       );
+        //     }
+        //     if (snapshot.connectionState == ConnectionState.done) {
+        //       return ChangeNotifierProvider<AuthenticationProvider>.value(
+        //         value: AuthenticationProvider.instance,
+        //         child: AppEntryPoint(),
+        //       );
+        //     }
+        //     return SlashPage();
+        //   },
+        // ),
+        );
   }
 }
 
+// ignore: must_be_immutable
 class AppEntryPoint extends StatelessWidget {
-  const AppEntryPoint(this._navigatorKey);
-  final GlobalKey<NavigatorState> _navigatorKey;
-  NavigatorState get _navigator => _navigatorKey.currentState;
+  AuthState _currentAuthState;
   @override
   Widget build(BuildContext context) {
     final authProvider =
@@ -60,35 +67,24 @@ class AppEntryPoint extends StatelessWidget {
       stream: authProvider.authBinaryState,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          _navigator.push(
+          Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => ConnectionWrongPage()),
           );
-        }
-        if (snapshot.hasData) {
-          if (snapshot.data == AuthState.authenticated) {
-            return HomePage();
-            // _goTo(HomePage(), context, authProvider);
-          } else if (snapshot.data == AuthState.unauthenticated) {
-            return WelcomePage();
-            // _goTo(WelcomePage(), context, authProvider)
+        } else if (snapshot.hasData) {
+          if (_currentAuthState != snapshot.data) {
+            if (snapshot.data == AuthState.authenticated) {
+              return Provider.value(
+                value: RealTimeLocation.instance,
+                updateShouldNotify: (_, __) => false,
+                child: HomePage(),
+              );
+            } else if (snapshot.data == AuthState.unauthenticated) {
+              return WelcomePage();
+            }
           }
         }
-        return SlashPage();
+        return WaitingPage();
       },
     );
   }
-
-  // void _goTo(Widget page, BuildContext context,
-  //     AuthenticationProvider authProvider) async {
-  //   await Future.delayed(Duration.zero);
-  //   _navigator.pushAndRemoveUntil(
-  //     MaterialPageRoute(builder: (context) {
-  //       return ChangeNotifierProvider<AuthenticationProvider>.value(
-  //         value: authProvider,
-  //         child: page,
-  //       );
-  //     }),
-  //     (_) => false,
-  //   );
-  // }
 }

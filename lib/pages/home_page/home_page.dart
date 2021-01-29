@@ -1,29 +1,52 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:real_time_location/real_time_location.dart';
+import 'package:taluxi/pages/call_page.dart';
+import 'package:taluxi/state_managers/taxi_finder.dart';
+import 'package:taluxi_common/taluxi_common.dart';
 import 'package:user_manager/user_manager.dart';
 
-import '../../core/constants/colors.dart';
-import '../../core/widgets/core_widgts.dart';
-import '../../core/widgets/custom_drawer.dart';
 import 'home_page_widgets.dart';
 
 final customWhiteColor = Color(0xF5FCFAFA);
 
 //TODO Refactoring : extracted widgets for better names.
 // ignore: must_be_immutable
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   AuthenticationProvider _authProvider;
+  TaxiFinder _taxiFinder;
   User _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    _taxiFinder = TaxiFinder(
+      realTimeLocation: Provider.of<RealTimeLocation>(context, listen: false),
+    );
+    _user = _authProvider.user;
+    _taxiFinder.taxiFinderState.listen(_manageTaxiFinderState);
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _taxiFinder.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    _authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-    _user = _authProvider.user;
     final deviceSize = MediaQuery.of(context).size;
     final floatingActionButtonSize = deviceSize.height * 0.085;
-    final userHasPhoto = (_user.photoUrl != null && _user.photoUrl.isNotEmpty);
+    final userHasPhoto = (_authProvider.user.photoUrl != null &&
+        _authProvider.user.photoUrl.isNotEmpty);
     return Scaffold(
       body: Builder(
         builder: (BuildContext context) => Stack(children: [
@@ -36,57 +59,12 @@ class HomePage extends StatelessWidget {
                 BottomRoundedContainer(
                   deviceSize: deviceSize,
                   topBorderRadius: Radius.circular(40),
-                ),
+                )
               ],
             ),
           ),
-          Positioned(
-            left: 10,
-            top: 60,
-            child: Container(
-                height: 48,
-                width: 49,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
-                        color: Colors.black12)
-                  ],
-                  image: userHasPhoto
-                      ? DecorationImage(
-                          image: NetworkImage(
-                            _user.photoUrl,
-                          ),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                  // shape: BoxShape.circle,
-                  color: customWhiteColor,
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: userHasPhoto
-                    ? null
-                    : Icon(
-                        Icons.person,
-                        color: Colors.black38,
-                        size: 43,
-                      )),
-          ),
-          Positioned(
-            right: 10,
-            top: 60,
-            child: Container(
-              decoration: BoxDecoration(
-                color: customWhiteColor,
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.menu),
-                onPressed: () => Scaffold.of(context).openEndDrawer(),
-              ),
-            ),
-          )
+          _userPhoto(userHasPhoto),
+          _menuButton(context)
         ]),
       ),
       endDrawer: CustomDrower(),
@@ -95,21 +73,62 @@ class HomePage extends StatelessWidget {
           child: Logo(backgroundColorIsOrange: true, fontSize: 43),
           height: floatingActionButtonSize,
           width: floatingActionButtonSize * 2.2,
-          onTap: () => showTrophiesWonDialog('ACDH', context),
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) =>
-          //         ChangeNotifierProvider<AuthenticationProvider>.value(
-          //       value: _authProvider,
-          //       child: TaxiTracker(),
-          //     ),
-          //   ),
-          // ),
+          onTap: () async {
+            await _taxiFinder.initialize(currentUserId: _user.uid);
+            _taxiFinder.findNearest();
+          },
         ),
         margin: EdgeInsets.only(bottom: deviceSize.height * .09),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Positioned _menuButton(BuildContext context) {
+    return Positioned(
+      right: 10,
+      top: 60,
+      child: Container(
+        decoration: BoxDecoration(
+          color: customWhiteColor,
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () => Scaffold.of(context).openEndDrawer(),
+        ),
+      ),
+    );
+  }
+
+  Positioned _userPhoto(bool userHasPhoto) {
+    return Positioned(
+      left: 10,
+      top: 60,
+      child: Container(
+        height: 48,
+        width: 49,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 5,
+              offset: Offset(0, 2),
+              color: Colors.black12,
+            )
+          ],
+          image: userHasPhoto
+              ? DecorationImage(
+                  image: NetworkImage(_user.photoUrl),
+                  fit: BoxFit.cover,
+                )
+              : null,
+          color: customWhiteColor,
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: userHasPhoto
+            ? null
+            : Icon(Icons.person, color: Colors.black38, size: 43),
+      ),
     );
   }
 
@@ -138,6 +157,52 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  void _manageTaxiFinderState(TaxiFinderState taxiFinderState) {
+    if (taxiFinderState is TaxiFound) {
+      _callTaxisFound(taxiFinderState.taxiDriversFound);
+    } else if (taxiFinderState is TaxiNotFound) {
+      _showTaxiNotFoundDialog();
+    } else
+      showWaitDialog("Recherche en cours", context);
+  }
+
+  void _callTaxisFound(List<Map<String, Coordinates>> taxiDriversFound) {
+    Navigator.of(context).pop(); // Pop the progress dialog
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CallPage(
+          callRecipients: taxiDriversFound,
+          currentUserId: _user.uid,
+        ),
+      ),
+    );
+  }
+
+  void _showTaxiNotFoundDialog() {
+    Navigator.of(context).pop(); // Pop the progress dialog
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Indisponible'),
+          content: Text(
+            "Désolé, aucun conducteur n'est connecté dans la zone où vous vous trouvez actuellement, mais vous pouvez élargir la zone de recherche.",
+          ),
+          actions: [
+            RaisedButton(
+              child: Text('Élargir la zone'),
+              onPressed: () {},
+            ),
+            RaisedButton(
+              child: Text('Fermer'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        );
+      },
+    );
+  }
 }
 
 class BottomRoundedContainer extends StatelessWidget {
@@ -163,17 +228,20 @@ class BottomRoundedContainer extends StatelessWidget {
         ),
       ),
       child: Container(
-        margin: EdgeInsets.only(top: 40),
+        margin: EdgeInsets.only(top: 34),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
         ),
-        child: Text(
-          "Pour trouver un taxi, vous avez juste à cliquez sur le bouton ci-dessous on s'occupera de vous mettre en contact avec le taxi le plus proche de l'endroit où vous vous trouvez actuellement.",
-          textScaleFactor: 1.5,
-          style: TextStyle(
-            fontFamily: 'Roboto',
-            color: Colors.black54,
+        child: Padding(
+          padding: EdgeInsets.only(left: deviceSize.width * 0.025),
+          child: Text(
+            "Pour trouver un taxi, vous avez juste à cliquez sur le bouton ci-dessous on s'occupera de vous mettre en contact avec le taxi le plus proche de l'endroit où vous vous trouvez actuellement.",
+            textScaleFactor: 1.55,
+            style: TextStyle(
+              fontFamily: 'Roboto',
+              color: Colors.black54,
+            ),
           ),
         ),
       ),

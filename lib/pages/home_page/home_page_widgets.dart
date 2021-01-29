@@ -1,8 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-import '../../core/constants/colors.dart';
+import 'package:taluxi_common/taluxi_common.dart';
 
 class CustomElevatedButton extends StatefulWidget {
   final Widget child;

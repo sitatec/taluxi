@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-
-import '../../core/constants/colors.dart';
+import 'package:taluxi_common/taluxi_common.dart';
 
 class CurvedNavigationBar extends StatefulWidget {
   final List<Widget> items;
